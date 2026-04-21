@@ -1,0 +1,52 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// TABLE 1 - game levels
+model Image {
+  id              String              @id @default(cuid())
+  slug            String              @unique // e.g. 'level1'
+  title           String
+  imageUrl        String
+  characters      Character[]
+  sessions        Session[]
+  scores          Score[]
+  createdAt       DateTime            @default(now())
+}
+
+// TABLE 2 - hidden characters in each level
+model Character {
+  id              String              @id @default(cuid())
+  name            String
+  xMin            Float
+  xMax            Float
+  yMin            Float
+  yMax            Float
+  imageId         String
+  image           Image               @relation(fields: [imageId], references: [id])
+}
+
+// TABLE 3 - one row per active game
+model Session {
+  id              String              @id @default(cuid())
+  imageId         String
+  image           Image               @relation(fields: [imageId], references: [id])
+  startTime       DateTime            @default(now())
+  endTime         DateTime?
+  found           String[]            // names of characters found so far
+}
+
+// TABLE 4 - leaderboard scores
+model Score {
+  id              String              @id @default(cuid())
+  playerName      String
+  timeMs          Int                 // time in milliseconds
+  imageId         String
+  image           Image               @relation(fields: [imageId], references: [id])
+  createdAt       DateTime            @default(now())
+}
