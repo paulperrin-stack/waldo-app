@@ -1,4 +1,4 @@
-import { UseEffect, useState, useCallBack } from 'react';
+import { UseEffect, useState, useCallBack, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import TargetBox from '../components/TargetBox';
@@ -59,5 +59,40 @@ export default function GamePage() {
         setTargetBox({ pixelX, pixelY, normX, normY });
     }, [targetBox]);
 
-    // Step 3
+    // Step 3: when player picks a character from the dropdown
+    const handleSelect = useCallback(async (character) => {
+        const { normX, normY } = targetBox;
+        setTargetBox(null); // close the box
+
+        // Ask the server: did we click in the right place?
+        const { data } = await axios.post(`${API}/api/validate`, {
+            sessionId,
+            characterId: character.id,
+            x: normX,
+            y: normY,
+        });
+
+        // Show the result as a toast message
+        setFeedback(data.message);
+        setTimeout(() => setFeedback(''), 2000);
+
+        if (!data.correct) return; // wrong - do nothing else
+        
+        // Correct !
+        setMarkers(prev => [
+            ...prev,
+            { name: data.characterName, x: data.markerX, y: data.markerY },
+        ]);
+
+        const newFound = [...found, data.characterName];
+        setFound(newFound);
+
+        // Did we find everyone?
+        if (image && newFound.length === image.charaters.length) {
+            const end = await axios.post(`${API}/api/sessions/end`, { sessionId });
+            setVictory({ timeMs: end.data.timeMs, imageId: image.id });
+        }
+    }, [targetBox, found, image, sessionId]);
+
+    // Characters the player has not found yet
 }
