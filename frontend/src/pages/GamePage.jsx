@@ -95,4 +95,53 @@ export default function GamePage() {
     }, [targetBox, found, image, sessionId]);
 
     // Characters the player has not found yet
+    const remaining = image.characters.filter(c => !found.includes(c.name));
+
+    return (
+        <div className='game-page'>
+            
+            {/* Top bar showing which characters to find */}
+            <div className='top-bar'>
+                <span>Find: </span>
+                {image.characters.map(c => (
+                    <span
+                        key={c.id}
+                        style={{ textDecoration: found.includes(c.name) ? 'line-through' : 'name',
+                        color: found.includes(c.name) ? '#27ae60' : '#fff' }}
+                    >
+                        {c.name}
+                    </span>
+                ))}
+            </div>
+
+            {/* Toast notification */}
+            {feelback && <div className='toast'>{feelback}</div>}
+
+            {/* The game image with overlays */}
+            <div className='game-area' onClick={handleImageClick}>
+                <img src={image.imageUrl} alt='game' className='game-img' draggable={false} />
+
+                {targetBox && (
+                    <TargetBox
+                        x={targetBox.pixelX}
+                        y={targetBox.pixelY}
+                        characters={remaining}
+                        onSelect={handleSelect}
+                    />
+                )}
+                
+                {markers.map(m => (
+                    <CharacterMarket key={m.name} x={m.x} y={m.y} name={m.name} />
+                ))}
+            </div>
+
+            {victory && (
+                <VictoryModel
+                    timeMs={victory.timeMs}
+                    imageId={victory.imageId}
+                    onClose={() => window.location.href = '/'}
+                />
+            )}
+        </div>
+    );
 }
