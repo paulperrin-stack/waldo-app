@@ -5,7 +5,8 @@ require('dotenv').config();
 const app = express();
 
 // allow the frontend to send requests
-app.use(cors({ origin: process.env.FRONTEND_URL || '*' }));
+app.use(cors({ origin: '*' }));
+app.use(express.json());
 
 // connect our routes files
 app.use('/api/images',          require('./routes/images'));

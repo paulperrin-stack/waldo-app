@@ -7,7 +7,7 @@ const prisma = new PrismaClient();
 // GET /api/leaderboard?imageId=xxx - fetch top 10 scores
 router.get('/', async (req, res) => {
     const scores = await prisma.score.findMany({
-        where: { imageId: req.query.imagedId },
+        where: { imageId: req.query.imageId },
         orderBy: { timeMs: 'asc' }, // fastest first
         take: 10,
     });

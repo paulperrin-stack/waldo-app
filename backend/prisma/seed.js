@@ -16,7 +16,7 @@ async function main() {
             // this path refers to frontend/public/images/level1.jpg
             // ...
             imageUrl: '/images/level1.jpg',
-            character: {
+            characters: {
                 create: [
                     // replace these with YOUR image's actual coordinates
                     { name: 'Waldo', xMin: 0.67, xMax: 0.73, yMin: 0.33, yMax: 0.39 },
@@ -31,4 +31,4 @@ async function main() {
 
 main()
     .catch(e => { console.error(e); process.exit(1); })
-    .finally(() => prisma.$disconnent());
+    .finally(() => prisma.$disconnect());

@@ -1,9 +1,9 @@
-import { UseEffect, useState, useCallBack, useCallback } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import TargetBox from '../components/TargetBox';
-import CharacterMarket from '../components/CharacterMarket';
-import VictoryModel from '../components/VictoryModel';
+import CharacterMarker from '../components/CharacterMarker';
+import VictoryModal from '../components/VictoryModal';
 
 const API = import.meta.env.VITE_API_URL;
 
@@ -38,7 +38,7 @@ export default function GamePage() {
     }, [slug]);
 
     // Step 2: when player clicks the image
-    const handleImageClick = useCallBack((e) => {
+    const handleImageClick = useCallback((e) => {
         // If a target box is already showing, close it
         if (targetBox) {
             setTargetBox(null);
@@ -88,13 +88,15 @@ export default function GamePage() {
         setFound(newFound);
 
         // Did we find everyone?
-        if (image && newFound.length === image.charaters.length) {
+        if (image && newFound.length === image.characters.length) {
             const end = await axios.post(`${API}/api/sessions/end`, { sessionId });
             setVictory({ timeMs: end.data.timeMs, imageId: image.id });
         }
     }, [targetBox, found, image, sessionId]);
 
     // Characters the player has not found yet
+    if (!image) return <p>Loading...</p>;
+
     const remaining = image.characters.filter(c => !found.includes(c.name));
 
     return (
@@ -106,7 +108,7 @@ export default function GamePage() {
                 {image.characters.map(c => (
                     <span
                         key={c.id}
-                        style={{ textDecoration: found.includes(c.name) ? 'line-through' : 'name',
+                        style={{ textDecoration: found.includes(c.name) ? 'line-through' : 'none',
                         color: found.includes(c.name) ? '#27ae60' : '#fff' }}
                     >
                         {c.name}
@@ -115,7 +117,7 @@ export default function GamePage() {
             </div>
 
             {/* Toast notification */}
-            {feelback && <div className='toast'>{feelback}</div>}
+            {feedback && <div className='toast'>{feedback}</div>}
 
             {/* The game image with overlays */}
             <div className='game-area' onClick={handleImageClick}>
@@ -131,7 +133,7 @@ export default function GamePage() {
                 )}
                 
                 {markers.map(m => (
-                    <CharacterMarket key={m.name} x={m.x} y={m.y} name={m.name} />
+                    <CharacterMarker key={m.name} x={m.x} y={m.y} name={m.name} />
                 ))}
             </div>
 
